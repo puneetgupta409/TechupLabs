@@ -1,0 +1,228 @@
+<app-loader *ngIf="showLoader"></app-loader>
+<ng-container *ngIf="!showLoader">
+  <div class="p-4 d-flex align-items-center justify-content-end gapTen">
+    <div>
+      <button (click)="addCustomer()" class="btn btn-secondary">
+        Add Customer
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTOMER TABLE  -->
+  <div class="p-4" *ngIf="customerData && customerData.length">
+    <div class="fw-semibold">
+      Customers
+    </div>
+    <div class="table-responsive">
+      <table class="mt-3 table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Region</th>
+            <th scope="col">Country</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of customerData">
+            <th scope="row">
+              {{ item.title }}
+            </th>
+            <td>
+              {{ item.name }}
+            </td>
+            <td>
+              {{ item.email }}
+            </td>
+            <td>
+              {{ item.region }}
+            </td>
+            <td>
+              {{ item.country }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <div class="p-4 d-flex align-items-center justify-content-center" *ngIf="!(customerData && customerData.length)">
+    <h3>No Customer Found</h3>
+  </div>
+  <!-- CUSTOMER TABLE  -->
+  <div class="p-4 d-flex align-items-center justify-content-end gapTen">
+    <div (click)="addPin()" *ngIf="customerData && customerData.length">
+      <button class="btn btn-secondary">
+        Add Pin
+      </button>
+    </div>
+  </div>
+
+  <!-- PIN TABLE -->
+  <div class="p-4" *ngIf="customerPinData && customerPinData.length">
+    <div class="fw-semibold">
+      List Of Pins
+    </div>
+    <div class="table-responsive">
+      <table class="mt-3 table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Image</th>
+            <th scope="col">Collaboratory</th>
+            <th scope="col">Privacy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of customerPinData">
+            <th scope="row">
+              {{ item.title }}
+            </th>
+            <td>
+              <img width="100px" [src]="item.image">
+            </td>
+            <td>
+              <span *ngFor="let customer of item.customers ;let last = last">
+                {{ customer}}
+                <br *ngIf="!last">
+              </span>
+            </td>
+            <td>
+              {{ item.privacy }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <div class="p-4 d-flex align-items-center justify-content-center"
+    *ngIf="(customerData && customerData.length) && !(customerPinData && customerPinData.length)">
+    <h3>No Pins Found</h3>
+  </div>
+  <!-- PIN TABLE -->
+</ng-container>
+
+
+<!-- CUSTOMER POPUP -->
+<p-dialog header="Add Customer" [(visible)]="showCustomerPopup" [closeOnEscape]="false" [closable]="false"
+  [modal]="true" [draggable]="false" [resizable]="false">
+  <div class="">
+    <form [formGroup]="customerForm" (ngSubmit)="submitForm()">
+      <div class="d-flex align-items-left gapTen flex-column">
+        <label for="name">Title<span class="colorRed">*</span></label>
+        <input placeholder="Enter Title" class="form-control" type="text" id="name" formControlName="title">
+        <div *ngIf="customerForm.get('title')?.invalid && customerForm.get('title')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('title')?.errors?.['required']">Title is required.</small>
+        </div>
+      </div>
+      <div class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="name">Name<span class="colorRed">*</span></label>
+        <input placeholder="Enter Name" class="form-control" type="text" id="name" formControlName="name">
+        <div *ngIf="customerForm.get('name')?.invalid && customerForm.get('name')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('name')?.errors?.['required']">Name is required.</small>
+        </div>
+      </div>
+      <div class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="email">Email<span class="colorRed">*</span></label>
+        <input placeholder="Enter Email" class="form-control" type="email" id="email" formControlName="email">
+        <div *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('email')?.errors?.['required']">Email is required.</small>
+          <small class="errorClass" *ngIf="customerForm.get('email')?.errors?.['email']">Invalid email format.</small>
+        </div>
+      </div>
+      <div *ngIf="regions && regions.length" class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="email">Region<span class="colorRed">*</span></label>
+        <ngx-select [items]="regions" optionTextField="region" optionValueField="region" placeholder="Select a region"
+          formControlName="region" (select)="onRegionChange($event)">
+        </ngx-select>
+        <div *ngIf="customerForm.get('region')?.invalid && customerForm.get('region')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('region')?.errors?.['required']">Region is required.</small>
+        </div>
+      </div>
+      <div *ngIf="customerForm.contains('country')" class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="email">Country<span class="colorRed">*</span></label>
+        <ngx-select [items]="filterCountries" optionTextField="country" optionValueField="country"
+          placeholder="Select a country" formControlName="country">
+        </ngx-select>
+        <div *ngIf="customerForm.get('country')?.invalid && customerForm.get('country')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('country')?.errors?.['required']">Country is
+            required.</small>
+        </div>
+      </div>
+      <button class="mt-4 btn btn-primary widthHundred" type="submit" [disabled]="customerForm.invalid">Submit</button>
+      <button class="mt-2 btn btn-secondary widthHundred" type="button" (click)="closePopup(1)">Close</button>
+    </form>
+  </div>
+
+</p-dialog>
+
+<!-- PIN POPUP -->
+<p-dialog header="Add Pin" [(visible)]="showPinPopup" [closeOnEscape]="false" [closable]="false" [modal]="true"
+  [draggable]="false" [resizable]="false">
+  <div class="">
+    <form [formGroup]="CustomerPinForm" (ngSubmit)="submitPinForm()">
+      <div class="d-flex align-items-left gapTen flex-column">
+        <label for="name">Title<span class="colorRed">*</span></label>
+        <input placeholder="Enter Title" class="form-control" type="text" id="name" formControlName="title">
+        <div *ngIf="customerForm.get('title')?.invalid && customerForm.get('title')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('title')?.errors?.['required']">Field is required.</small>
+        </div>
+      </div>
+      <div class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="name">Image<span class="colorRed">*</span></label>
+        <div *ngIf="imageUrl">
+          <img width="100px" [src]="imageUrl">
+        </div>
+        <div *ngIf="!imageUrl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="m21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+            </g>
+          </svg>
+        </div>
+        <div class="avatar-upload">
+          <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" #fileInput (change)="uploadFile($event)" />
+        </div>
+        <button type="button" class="chooseFile" (click)="fileInput.click()">Upload Image</button>
+      </div>
+      <div class="mt-2 d-flex align-items-left gapTen flex-column">
+        <label for="name">Select Collaboratory<span class="colorRed">*</span></label>
+        <ngx-select [items]="customerData" optionTextField="name" optionValueField="name" [multiple]="true"
+          placeholder="Select Customer" formControlName="customers">
+        </ngx-select>
+        <div *ngIf="customerForm.get('customers')?.invalid && customerForm.get('customers')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('customers')?.errors?.['required']">Field is
+            required.</small>
+        </div>
+      </div>
+      <div class="mt-2 d-flex align-items-left gapTen">
+        <label for="name">Privacy<span class="colorRed">*</span>:</label>
+        <label class="flexClass">
+          <input type="radio" formControlName="privacy" value="public">
+          Public
+        </label>
+        <label class="flexClass">
+          <input type="radio" formControlName="privacy" value="private">
+          Private
+        </label>
+        <div *ngIf="customerForm.get('customers')?.invalid && customerForm.get('customers')?.touched">
+          <small class="errorClass" *ngIf="customerForm.get('customers')?.errors?.['required']">Field is
+            required.</small>
+        </div>
+      </div>
+      <button class="mt-4 btn btn-primary widthHundred" type="submit"
+        [disabled]="CustomerPinForm.invalid">Submit</button>
+      <button class="mt-2 btn btn-secondary widthHundred" type="button" (click)="closePopup(2)">Close</button>
+    </form>
+  </div>
+
+</p-dialog>
+<!-- PIN POPUP -->
+
+
+<!-- ERROR SUCCESS TOAST -->
+<p-toast [life]="1000" position="top-left"></p-toast>

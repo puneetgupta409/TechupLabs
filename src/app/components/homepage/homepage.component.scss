@@ -1,0 +1,57 @@
+.gapTen{
+    gap: 10px;
+}
+:host::ng-deep .table{
+    border: 1px solid #eee;
+}
+.errorClass{
+    color: red;
+}
+
+:host::ng-deep .p-dialog{
+    min-width: 500px;
+    @media (max-width: 768px) {
+        min-width: unset;
+        width: 100%;
+    }
+}
+:host::ng-deep .form-control:focus{
+    border: 1px solid #dee2e6;
+    box-shadow: none;
+}
+:host::ng-deep .form-select:focus{
+    border: 1px solid #dee2e6;
+    box-shadow: none;
+}
+.widthHundred{
+    width: 100%;
+}
+
+.avatar-upload  input {
+    display: none;
+  }
+  
+.chooseFile{
+    border: none;
+    border-radius: 8px;
+    padding: 7px;
+}
+
+@media (max-width: 768px){
+    :host::ng-deep .p-dialog .p-dialog-content:last-of-type{
+        border-radius: 0px;
+    }
+    :host::ng-deep .p-dialog-mask{
+        align-items: end;
+    }
+}
+.flexClass{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.colorRed{
+    color: red;
+}
